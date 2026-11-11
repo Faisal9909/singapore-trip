@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>وش نروح في سنغافورة؟</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B7566">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&family=Noto+Kufi+Arabic:wght@600;800&display=swap">
+<style>
+/* Layout: summary + filters, a real map with numbered pins coloured by decision, then photo cards grouped by kind with two big vote buttons. */
+:root{
+  --bg:#F2F5F3; --card:#FFFFFF; --fg:#13201B; --muted:#5A6A63; --line:#D5DDD8;
+  --accent:#0B7566; --accent-soft:#DDEFEA;
+  --mixed:#C27A00; --yes:#1E8A4C; --yes-soft:#DDF2E4; --no:#B4402C; --no-soft:#F8E1DC; --none:#8A9891;
+  --pin:#13201B; --pin-fg:#FFFFFF; --halo:#FFFFFF; --shade:rgba(10,20,16,.82);
+  --display:"Noto Kufi Arabic",system-ui,sans-serif; --body:"IBM Plex Sans Arabic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1613; --card:#17211D; --fg:#E6EEEA; --muted:#97A8A0; --line:#2A3833;
+  --accent:#4CC2AE; --accent-soft:#16332D; --mixed:#E9B44C; --yes:#5CCB88; --yes-soft:#173322; --no:#EE8471; --no-soft:#3A1E19; --none:#7C8C85;
+  --pin:#13201B; --pin-fg:#FFFFFF; --halo:#FFFFFF; --shade:rgba(0,0,0,.88); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1613; --card:#17211D; --fg:#E6EEEA; --muted:#97A8A0; --line:#2A3833;
+  --accent:#4CC2AE; --accent-soft:#16332D; --mixed:#E9B44C; --yes:#5CCB88; --yes-soft:#173322; --no:#EE8471; --no-soft:#3A1E19; --none:#7C8C85;
+  --pin:#13201B; --pin-fg:#FFFFFF; --halo:#FFFFFF; --shade:rgba(0,0,0,.88); color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.7;direction:rtl}
+.wrap{max-width:920px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.4;text-wrap:balance}
+h1{font-size:1.7rem} h2{font-size:1.2rem} h3{font-size:1.02rem}
+.sub{color:var(--muted);margin:2px 0 0}
+.status{font-size:.85rem;color:var(--muted)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--bg);padding-block:8px;border-bottom:1px solid var(--line);display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.counts{display:flex;gap:12px;font-weight:600;font-variant-numeric:tabular-nums;font-size:.95rem}
+.counts .y{color:var(--yes)} .counts .n{color:var(--no)} .counts .u{color:var(--muted)} .counts .m{color:var(--mixed)}
+.me{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px;background:var(--accent-soft);padding:10px 12px;border-radius:10px}
+.me input{font:inherit;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--fg);min-width:0;flex:1}
+.me button{font:inherit;font-weight:600;padding:6px 16px;border-radius:8px;border:0;background:var(--accent);color:var(--card);cursor:pointer}
+.card[data-state="mixed"]{border-color:var(--mixed)}
+.who span{margin-left:10px}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.chipbtn{font:inherit;font-size:.82rem;cursor:pointer;padding:3px 12px;border-radius:99px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
+.chipbtn[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+button:focus-visible,a:focus-visible,img:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mapbox{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.maptabs{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--line);overflow-x:auto}
+svg.map{display:block;width:100%;height:auto}
+svg.map .pin{cursor:pointer}
+.maplegend{display:flex;flex-wrap:wrap;gap:12px;padding:8px 12px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--line)}
+.maplegend i{display:inline-block;width:12px;height:12px;border-radius:50%;margin-left:5px;vertical-align:-1px}
+section.cat{display:flex;flex-direction:column;gap:12px}
+.cathead{border-bottom:2px solid var(--fg);padding-bottom:4px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0;scroll-margin-top:70px;transition:box-shadow .3s}
+.card.flash{box-shadow:0 0 0 3px var(--accent)}
+.card[data-state="yes"]{border-color:var(--yes)}
+.card[data-state="no"]{opacity:.72}
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:var(--line)}
+.photos button{all:unset;cursor:zoom-in;display:block;aspect-ratio:4/3;max-width:100%;background:var(--line)}
+.photos img{width:100%;height:100%;object-fit:cover;display:block}
+.photos button:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.body{padding:12px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.top{display:flex;gap:8px;align-items:baseline}
+.num{flex:none;width:26px;height:26px;border-radius:50%;background:var(--pin);color:var(--pin-fg);font-size:.78rem;font-weight:600;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.desc{font-size:.9rem;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.82rem;color:var(--muted)}
+.facts b{color:var(--fg);font-weight:600;font-variant-numeric:tabular-nums}
+.warn{font-size:.8rem;color:var(--no)}
+.where{font:inherit;font-size:.8rem;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-align:right;text-decoration:underline}
+.vote{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto;padding-top:8px}
+.vote button{font:inherit;font-weight:600;cursor:pointer;padding:9px 6px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--fg)}
+.vote .yes[aria-pressed="true"]{background:var(--yes);border-color:var(--yes);color:var(--card)}
+.vote .no[aria-pressed="true"]{background:var(--no);border-color:var(--no);color:var(--card)}
+.vote button:disabled{cursor:not-allowed;opacity:.5}
+.who{font-size:.78rem;color:var(--muted);min-height:1.2em}
+.lb{position:fixed;inset:0;z-index:20;background:var(--shade);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.lb[hidden]{display:none}
+.lb img{max-width:100%;max-height:72vh;border-radius:8px}
+.lb p{color:#fff;font-size:.82rem;margin:0;text-align:center;max-width:640px}
+.lb a{color:#bfe9df}
+.lb .row{display:flex;gap:10px}
+.lb button{font:inherit;cursor:pointer;padding:6px 16px;border-radius:99px;border:1px solid #ffffff66;background:transparent;color:#fff}
+details.credits{font-size:.78rem;color:var(--muted)}
+details.credits li{margin-bottom:2px}
+.note{font-size:.82rem;color:var(--muted)}
+@media (prefers-reduced-motion: reduce){.card{transition:none}}
+</style>
+
+</head><body>
+<div class="wrap">
+  <header>
+    <h1>وش نروح في سنغافورة؟</h1>
+    <p class="sub">كل فعالية فيها 4 صور ونبذة. كل واحد يختار <b>نروح</b> أو <b>لا</b>، وتشوفون اختيار بعض.</p>
+    <form class="me" id="meform" hidden><label for="mename">وش اسمك؟</label><input id="mename" maxlength="20" required placeholder="مثلًا: فيصل"><button>حفظ</button></form>
+    <p class="status" id="status">جاري تحميل الاختيارات…</p>
+  </header>
+
+  <div class="bar">
+    <div class="counts"><span class="y" id="cy">اتفقنا 0</span><span class="m" id="cm">اختلفنا 0</span><span class="u" id="cu">ما اخترت 0</span></div>
+    <div class="filters" id="filters">
+      <button class="chipbtn" data-f="all" aria-pressed="true">الكل</button>
+      <button class="chipbtn" data-f="mine" aria-pressed="false">ما اخترت</button>
+      <button class="chipbtn" data-f="yes" aria-pressed="false">اتفقنا نروح</button>
+      <button class="chipbtn" data-f="mixed" aria-pressed="false">اختلفنا</button>
+      <button class="chipbtn" data-f="no" aria-pressed="false">لا</button>
+    </div>
+  </div>
+
+  <div class="mapbox">
+    <div class="maptabs" id="maptabs"></div>
+    <svg class="map" id="map" role="img" aria-label="خريطة الفعاليات"></svg>
+    <div class="maplegend"><span><i style="background:var(--yes)"></i>نروح</span><span><i style="background:var(--no)"></i>لا</span><span><i style="background:var(--mixed)"></i>اختلفنا</span><span><i style="background:var(--pin)"></i>ما أحد اختار</span><span>اضغطوا الرقم عشان تروحون للفعالية</span></div>
+  </div>
+
+  <div id="cats"></div>
+
+  <p class="note">الأسعار لشخصين بالريال، من نتائج البحث يوم 11 نوفمبر.</p>
+  <details class="credits"><summary>مصادر الصور</summary><ol id="credits"></ol><p>الصور من Wikimedia Commons بتراخيصها المذكورة. الخرائط © OpenStreetMap contributors.</p></details>
+</div>
+
+<div class="lb" id="lb" hidden role="dialog" aria-modal="true" aria-label="صورة مكبرة">
+  <img id="lbimg" alt="">
+  <p id="lbcap"></p>
+  <div class="row"><button id="lbprev">السابقة</button><button id="lbclose">إغلاق</button><button id="lbnext">التالية</button></div>
+</div>
+
+<script>
+const CATS=[["sights","معالم وحدائق"],["views","إطلالات من فوق"],["animals","حدائق الحيوانات (ماندا)"],["sentosa","سنتوسا ويونيفرسال"],["shows","عروض ليلية مجانية"],["areas","أحياء"],["shop","تسوق"],["airport","في المطار"]];
+const ACTS=[
+ ["gardens","sights","center","الحدائق: القبة الزهرية + غابة السحاب","قبتين زجاج مكيفة. الأولى فيها زهور من كل العالم، والثانية فيها شلال داخلي طوله 35 متر.","2–3 ساعات","267"],
+ ["fortcanning","sights","center","Fort Canning Park","حديقة على تلة وسط البلد، فيها ممرات بين الأشجار وبوابات تاريخية. مشيها هادي.","ساعة","مجاني"],
+ ["merlion","sights","center","الميرلايون","تمثال رمز سنغافورة، ومن عنده تطلع أحلى صورة لمارينا باي ساندز.","30–60 دقيقة","مجاني"],
+ ["river","sights","center","قارب النهر","رحلة بقارب خشبي في نهر سنغافورة، أحلى شي بالليل.","40 دقيقة","145 (131 بكود APP10)"],
+ ["gallery","sights","center","National Gallery","مبنى تاريخي فخم، وسطحه يطل على البلد. دخول المبنى مجاني.","ساعة","مجاني"],
+ ["skypark","views","center","سطح مارينا باي ساندز","الدور 57 فوق الأبراج الثلاثة، وتشوفون منه البلد كلها.","ساعة","203 قبل 4:30 العصر / 226 بعدها"],
+ ["flyer","views","center","Singapore Flyer","عجلة دوارة ضخمة بكبائن زجاج مكيفة. إطلالتها قريبة من إطلالة السطح.","30–45 دقيقة","~267"],
+ ["birds","animals","mandai","حديقة الطيور","أقفاص ضخمة تمشون داخلها، والطيور حولكم. فيها بطاريق، وفيها أكل حلال معتمد.","3–4 ساعات","284"],
+ ["zoo","animals","mandai","حديقة الحيوان","حيواناتها شبه طليقة، وما فيها أقفاص تقريبًا.","3–4 ساعات","284"],
+ ["nightsafari","animals","mandai","السفاري الليلي","حديقة حيوانات تفتح بالليل بس، وتلفونها بقطار مفتوح.","3 ساعات","294","ما فيها أكل حلال معتمد"],
+ ["uss","sentosa","sentosa","يونيفرسال","ملاهي فيها ألعاب أفلام هوليوود وأفعوانيات، وفيها مطاعم حلال.","يوم كامل","516 (Express يزيد ~464)"],
+ ["cablecar","sentosa","sentosa","التلفريك","من HarbourFront لين سنتوسا، فوق البحر.","30–60 دقيقة","191"],
+ ["luge","sentosa","sentosa","Luge","عربية بدون موتور تنزل فيها من تلة بمسار ملتف.","1–2 ساعة","302 مع التلفريك"],
+ ["oceanarium","sentosa","sentosa","الأكواريوم (Oceanarium)","من أكبر الأكواريومات في العالم، وفيه قروش ومانتا.","ساعتين","290–319"],
+ ["wings","sentosa","sentosa","Wings of Time + SkyHelix","عرض بالليل على البحر فيه موية ونار وليزر، ومعه منصة ترتفع فيكم فوق سنتوسا.","ساعة","~171"],
+ ["rhapsody","shows","center","Garden Rhapsody","الأشجار العملاقة في الحدائق تنور مع الموسيقى. الساعة 7:45 و8:45 بالليل.","15 دقيقة","مجاني"],
+ ["spectra","shows","center","Spectra","عرض موية وليزر على البحر قدام مارينا باي ساندز. الساعة 8 و9 بالليل.","15 دقيقة","مجاني"],
+ ["kampong","areas","center","كامبونغ جلام وحجي لين","الحي العربي والملايوي، وفيه شارع ملون مليان محلات صغيرة. أفضل مكان للأكل الحلال.","2 ساعة","مجاني"],
+ ["littleindia","areas","center","ليتل إنديا","الحي الهندي، فيه ألوان وبهارات وذهب.","2 ساعة","مجاني"],
+ ["chinatown","areas","center","تشاينا تاون","الحي الصيني، وفيه أسواق تذكارات رخيصة.","2 ساعة","مجاني"],
+ ["orchard","shop","center","شارع Orchard","الماركات الفاخرة (ION و Takashimaya و Paragon)، وفي ديسمبر الشارع كامل مزين للكريسماس.","2–3 ساعات","—"],
+ ["bugis","shop","center","Bugis Junction وسوق Bugis Street","مول بماركات متوسطة، وسوق تذكارات رخيص. مشي من الفندق.","1–2 ساعة","—"],
+ ["mustafa","shop","center","Mustafa Centre","مفتوح 24 ساعة. فيه ذهب وعطور وشوكولاتة وبهارات بأسعار رخيصة.","1–2 ساعة","—"],
+ ["simlim","shop","center","Sim Lim Square و Funan","مولات إلكترونيات. في Sim Lim قارنوا الأسعار قبل تشترون.","1 ساعة","—"],
+ ["shoppes","shop","center","The Shoppes في MBS","مول فاخر تحت مارينا باي ساندز.","1–2 ساعة","—"],
+ ["vivocity","shop","sentosa","VivoCity","من أكبر المولات، وهو بوابة سنتوسا.","1–2 ساعة","—"],
+ ["jewel","airport","","شلال Jewel","أكبر شلال داخلي في العالم، داخل مول المطار. يناسب يوم الوصول أو المغادرة.","ساعة","مجاني"],
+ ["canopy","airport","","Canopy Park في Jewel","الدور الأعلى فوق الشلال، فيه جسر معلق ومتاهة مرايا وشبك تمشون عليه.","1–2 ساعة","~115"]
+].map((a,i)=>({id:a[0],cat:a[1],reg:a[2],name:a[3],desc:a[4],dur:a[5],price:a[6],warn:a[7]||"",n:i+1}));
+const COORD={"gardens": [1.284, 103.8645], "fortcanning": [1.2949, 103.8459], "merlion": [1.2868, 103.8545], "river": [1.2888, 103.8465], "gallery": [1.2903, 103.8516], "skypark": [1.2834, 103.8607], "flyer": [1.2893, 103.8631], "rhapsody": [1.2818, 103.8636], "spectra": [1.285, 103.8584], "kampong": [1.301, 103.8589], "littleindia": [1.3066, 103.8518], "chinatown": [1.2833, 103.8443], "orchard": [1.304, 103.8318], "bugis": [1.2998, 103.8556], "mustafa": [1.3098, 103.8555], "simlim": [1.303, 103.853], "shoppes": [1.2836, 103.8597], "hotel": [1.301, 103.852], "uss": [1.254, 103.8238], "cablecar": [1.2652, 103.8204], "luge": [1.2524, 103.8178], "oceanarium": [1.2583, 103.8187], "wings": [1.2508, 103.8158], "vivocity": [1.2642, 103.8228], "birds": [1.4044, 103.7876], "zoo": [1.4043, 103.793], "nightsafari": [1.4022, 103.788]};
+const REG={"center": {"z": 15, "x0": 6613641.28, "y0": 4163697.1, "w": 1000, "h": 820}, "sentosa": {"z": 15, "x0": 6612980.68, "y0": 4164578.12, "w": 1000, "h": 820}, "mandai": {"z": 17, "x0": 26450673.12, "y0": 16646095.88, "w": 1000, "h": 620}};
+const REGNAMES={center:"وسط البلد",sentosa:"سنتوسا",mandai:"ماندا"};
+const PHOTOS={"gardens": [{"src": "photos/gardens_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Flower-Dome-and-Cloud-Forest-in-The-Gardens-01.jpg", "author": "CEphoto, Uwe Aranas", "license": "CC BY-SA 3.0"}, {"src": "photos/gardens_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Cloud_Forest_-_Gardens_by_the_Bay_-_at_night_seen_from_the_sky_observation_deck_of_Marina_Bay_Sands_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}, {"src": "photos/gardens_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_View_from_Marina_Bay_Sands,_Gardens_by_the_Bay_--_2019_--_4722.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}, {"src": "photos/gardens_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Gardens_by_the_Bay_Flower_Dome_%26_Cloud_Forest_bei_Nacht.jpg", "author": "Zairon", "license": "CC BY-SA 4.0"}], "fortcanning": [{"src": "photos/fortcanning_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Fort_Canning_Hill_tombstones_IMG_9732.jpg", "author": "Bjoertvedt", "license": "CC BY-SA 4.0"}, {"src": "photos/fortcanning_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Park_bench,_Fort_Canning_Park,_Singapore_-_20110506.jpg", "author": "Michael Coghlan", "license": "CC BY-SA 2.0"}, {"src": "photos/fortcanning_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Fort_Canning_Park,_Singapore_-_20120212.jpg", "author": "Thomas Timlen.", "license": "CC BY 2.0"}, {"src": "photos/fortcanning_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Lizard_in_Fort_Canning_Park,_Singapore_-_20110924.jpg", "author": "janebelindasmith", "license": "CC BY 2.0"}], "merlion": [{"src": "photos/merlion_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Merli%C3%B3n,_Marina_Bay,_Singapur,_2023-08-18,_DD_45-47_HDR.jpg", "author": "Diego Delso", "license": "CC BY-SA 4.0"}, {"src": "photos/merlion_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Merlion-at-Marina-Bay-01.jpg", "author": "CEphoto, Uwe Aranas", "license": "CC BY-SA 3.0"}, {"src": "photos/merlion_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Merlion-at-Marina-Bay-02.jpg", "author": "CEphoto, Uwe Aranas", "license": "CC BY-SA 3.0"}, {"src": "photos/merlion_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Merlion-at-Marina-Bay-03.jpg", "author": "CEphoto, Uwe Aranas", "license": "CC BY-SA 3.0"}], "river": [{"src": "photos/river_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Bumboat,_Singapore.jpg", "author": "EurovisionNim", "license": "CC BY-SA 4.0"}, {"src": "photos/river_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Bumboat_(7448752256).jpg", "author": "shankar s. from Poona (pune), India, India", "license": "CC BY 2.0"}, {"src": "photos/river_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Clarke_Quay_and_Singapore_River_(3170381029).jpg", "author": "edwin.11", "license": "CC BY 2.0"}, {"src": "photos/river_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Clarke_Quay,_Singapore_(3171104214).jpg", "author": "William Cho", "license": "CC BY-SA 2.0"}], "gallery": [{"src": "photos/gallery_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:National_Gallery_Singapore_1.jpg", "author": "Uzoma Ozurumba", "license": "CC BY-SA 4.0"}, {"src": "photos/gallery_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Interior_of_the_National_Gallery_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}, {"src": "photos/gallery_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:National_Gallery_Singapore_2.jpg", "author": "Uzoma Ozurumba", "license": "CC BY-SA 4.0"}, {"src": "photos/gallery_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:National_Gallery_Singapore,_January_2024.jpg", "author": "GoAheadFan95", "license": "CC BY-SA 4.0"}], "skypark": [{"src": "photos/skypark_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Infinity_Pool_at_Marina_Bay_Sands_SkyPark_Singapore_Ank_Kumar_Infosys_Limited_05.jpg", "author": "Ank Kumar", "license": "CC BY-SA 4.0"}, {"src": "photos/skypark_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_Marina_Bay_--_2019_--_4701-6.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}, {"src": "photos/skypark_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_View_from_Marina_Bay_Sands,_Gardens_by_the_Bay_--_2019_--_4722.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}, {"src": "photos/skypark_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_View_from_Marina_Bay_Sands,_ArtScience_Museum_--_2019_--_4714.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}], "flyer": [{"src": "photos/flyer_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_Singapore_Flyer_--_2019_--_4753.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}, {"src": "photos/flyer_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Singapore-Flyer-Ferris-wheel-01.jpg", "author": "CEphoto, Uwe Aranas", "license": "CC BY-SA 3.0"}, {"src": "photos/flyer_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Marina_Bay,_Singapore_(233737).jpg", "author": "Moheen Reeyad", "license": "CC BY-SA 4.0"}, {"src": "photos/flyer_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_View_from_Marina_Bay_Sands,_Singapore_Flyer_--_2019_--_4720.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}], "birds": [{"src": "photos/birds_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Bird_Paradise_entrance.jpg", "author": "Justanothersgwikieditor", "license": "CC BY-SA 4.0"}, {"src": "photos/birds_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Wings_of_the_World_show,_Sky_Amphitheatre,_Bird_Paradise,_Singapore_-_01.jpg", "author": "Sgconlaw", "license": "CC BY-SA 4.0"}, {"src": "photos/birds_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Wings_of_the_World_show,_Sky_Amphitheatre,_Bird_Paradise,_Singapore_-_02.jpg", "author": "Sgconlaw", "license": "CC BY-SA 4.0"}, {"src": "photos/birds_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:A_red-fan_parrot_quenches_his_thirst.jpg", "author": "711jasminetea", "license": "CC BY-SA 4.0"}], "zoo": [{"src": "photos/zoo_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Two_white_tigers_playing_in_the_water_at_Singapore_Zoo.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}, {"src": "photos/zoo_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Hello,_Human..._(SINGAPORE_ZOO-LION-ANIMALS-GREETING)_VIII_(1347486440).jpg", "author": "Chi King", "license": "CC BY 2.0"}, {"src": "photos/zoo_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Hello,_Human..._(SINGAPORE_ZOO-OTTER-ANIMALS-GREETING)_IV_(752719117).jpg", "author": "Chi King", "license": "CC BY 2.0"}, {"src": "photos/zoo_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_zoo,_Singapore_(33908150388).jpg", "author": "pelican from Tokyo, Japan", "license": "CC BY-SA 2.0"}], "nightsafari": [{"src": "photos/nightsafari_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Night_Safari,_Singapore_(32844106997).jpg", "author": "pelican from Tokyo, Japan", "license": "CC BY-SA 2.0"}, {"src": "photos/nightsafari_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Night_Safari_-_panoramio.jpg", "author": "Mikhail Deynekin", "license": "CC BY-SA 3.0"}, {"src": "photos/nightsafari_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Night_Safari_entrance_2016.jpg", "author": "Orderinchaos", "license": "CC BY-SA 4.0"}, {"src": "photos/nightsafari_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Entrance_of_Night_Safari,_Singapore,_2012.jpg", "author": "Allie Caulfield", "license": "CC BY 2.0"}], "uss": [{"src": "photos/uss_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Universal_Studios_Singapore_globe_(125026).jpg", "author": "Moheen Reeyad", "license": "CC BY-SA 4.0"}, {"src": "photos/uss_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Universal_Studios_lake_(6952709373).jpg", "author": "Ivan Bandura", "license": "CC BY 2.0"}, {"src": "photos/uss_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Roller_coaster_at_Universal_Studios_Singapore,_20240206_1306_6440.jpg", "author": "Jakub Hałun", "license": "CC BY 4.0"}, {"src": "photos/uss_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Universal_Studios_Singapore_5.jpg", "author": "Lunita28mx", "license": "CC BY 4.0"}], "cablecar": [{"src": "photos/cablecar_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore-Sentosa_Cable_Car_in_2023_01.jpg", "author": "Renek78", "license": "CC0"}, {"src": "photos/cablecar_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Cable_Car_-_Sentosa_Line.jpg", "author": "Maksym Kozlenko", "license": "CC BY-SA 4.0"}, {"src": "photos/cablecar_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_Cable_Car_-_Sentosa_Line_2.jpg", "author": "Maksym Kozlenko", "license": "CC BY-SA 4.0"}, {"src": "photos/cablecar_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:SG-sentosa-cable-car.jpg", "author": "Balou46", "license": "CC BY-SA 3.0"}], "luge": [{"src": "photos/luge_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Sentosa_Luge_3.JPG", "author": "Terence Ong", "license": "CC BY 2.5"}, {"src": "photos/luge_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Luge_ride_at_Sentosa_Luge_and_Skyride,_Singapore_-_20140213.jpg", "author": "RM Bulseco from Davao City, Philippines.", "license": "CC BY 2.0"}, {"src": "photos/luge_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Skyride_at_Sentosa_Luge_and_Skyride,_Singapore_-_20080209.jpg", "author": "Brenda Butterworth.", "license": "CC BY-SA 2.0"}, {"src": "photos/luge_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Sentosa_Luge_and_Skyride,_Sentosa,_Aug_06.JPG", "author": "User:Sengkang", "license": "Copyrighted free use"}], "oceanarium": [{"src": "photos/oceanarium_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:S.E.A._Aquarium,_Sentosa_Cove_(12472491073).jpg", "author": "KimonBerlin", "license": "CC BY-SA 2.0"}, {"src": "photos/oceanarium_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Shark_Seas,_S.E.A._Aquarium,_Resorts_World_Sentosa,_Singapore_-_20180220.jpg", "author": "Banej", "license": "CC BY-SA 3.0"}, {"src": "photos/oceanarium_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:S.E.A._Aquarium,_Sentosa_Cove_(12472324785).jpg", "author": "KimonBerlin", "license": "CC BY-SA 2.0"}, {"src": "photos/oceanarium_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:S.E.A._Aquarium,_Sentosa_Cove_(12472365465).jpg", "author": "KimonBerlin", "license": "CC BY-SA 2.0"}], "wings": [{"src": "photos/wings_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Wings_of_Time_Fireworks_Symphony.jpg", "author": "ScribblingGeek", "license": "CC BY-SA 4.0"}, {"src": "photos/wings_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Songs_of_the_Sea.jpg", "author": "Bruce Tuten", "license": "CC BY 2.0"}, {"src": "photos/wings_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Songs_of_the_Sea_stage.JPG", "author": "Tommyang", "license": "CC BY-SA 3.0"}, {"src": "photos/wings_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Kelongs_forming_part_of_the_Songs_of_the_Sea,_Sentosa,_Singapore_-_20101201.jpg", "author": "Diego Delso", "license": "CC BY 3.0"}], "rhapsody": [{"src": "photos/rhapsody_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Supertree_Grove,_Gardens_by_the_Bay_light_show_19_August_2023_30.jpg", "author": "Jeromi Mikhael", "license": "CC0"}, {"src": "photos/rhapsody_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Supertree_Grove,_Gardens_by_the_Bay_light_show_19_August_2023_24.jpg", "author": "Jeromi Mikhael", "license": "CC0"}, {"src": "photos/rhapsody_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Supertree_Grove,_Singapore,_augusti_2023_04.jpg", "author": "Johan Jönsson (Julle)", "license": "CC BY-SA 4.0"}, {"src": "photos/rhapsody_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Supertree_Grove,_Gardens_by_the_Bay_light_show_19_August_2023_22.jpg", "author": "Jeromi Mikhael", "license": "CC0"}], "spectra": [{"src": "photos/spectra_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Laser_light_show_at_the_Marina_Bay_Sands_(8584152585).jpg", "author": "Erwin Soo from Singapore, Singapore", "license": "CC BY 2.0"}, {"src": "photos/spectra_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Light_Show_at_Marina_Bay_Sands_(25135398942).jpg", "author": "aotaro from Yokohama, Japan", "license": "CC BY 2.0"}, {"src": "photos/spectra_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Marina_Bay_Sands_Light_and_Water_Show,_Singapore.jpg", "author": "Charles J. Sharp", "license": "CC BY-SA 4.0"}, {"src": "photos/spectra_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Marina_Bay_Sands_Singapore_Laser_Show.jpg", "author": "HS2007T2.", "license": "CC BY-SA 4.0"}], "kampong": [{"src": "photos/kampong_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Haji_Lane,_Kampong_Glam_(02).jpg", "author": "Moheen Reeyad", "license": "CC BY-SA 4.0"}, {"src": "photos/kampong_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Wikimania_2023-Singapore_today-Kampong_Glam-Haji_Lane-02816.jpg", "author": "Rainer Halama", "license": "CC BY-SA 4.0"}, {"src": "photos/kampong_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:KPG_-_Haji_Lane_street_art_in_Kampong_Glam,_Singapore,_2019.jpg", "author": "Josep M. Gracia", "license": "CC BY-SA 4.0"}, {"src": "photos/kampong_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Wikimania_2023-Singapore_today-Kampong_Glam-Haji_Lane-02815.jpg", "author": "Rainer Halama", "license": "CC BY-SA 4.0"}], "littleindia": [{"src": "photos/littleindia_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:2016_Singapur,_Little_India,_Meczet_Abdul_Gaffoor_(03).jpg", "author": "Marcin Konsek", "license": "CC BY-SA 4.0"}, {"src": "photos/littleindia_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Masjid_Abdul_Gaffoor_6,_Sep_06.JPG", "author": "User:Sengkang", "license": "Copyrighted free use"}, {"src": "photos/littleindia_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Little_India,_Singapore_(LRM_20230819_154829).jpg", "author": "Matti Blume", "license": "CC BY-SA 4.0"}, {"src": "photos/littleindia_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Little_India,_Singapore_(LRM_20230818_202704-RR).jpg", "author": "Matti Blume", "license": "CC BY-SA 4.0"}], "chinatown": [{"src": "photos/chinatown_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Pagoda_Street_Chinatown_Singapore.jpg", "author": "kallerna", "license": "CC BY-SA 4.0"}, {"src": "photos/chinatown_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_China_Town,_Pagoda_Street_--_2019_--_4507.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}, {"src": "photos/chinatown_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_China_Town,_Pagoda_Street_--_2019_--_4515.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}, {"src": "photos/chinatown_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore_(SG),_China_Town,_Pagoda_Street_--_2019_--_4505.jpg", "author": "Dietmar Rabich", "license": "CC BY-SA 4.0"}], "orchard": [{"src": "photos/orchard_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:New_Orchard_Road_Flower_Zone.jpg", "author": "Niall Sohan (talk)", "license": "Public domain"}, {"src": "photos/orchard_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Large_interior_view_of_Plaza_Singapura_Shopping_mall_Orchard_Road_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}, {"src": "photos/orchard_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:ION_Orchard_and_Orchard_Road,_Singapore_(42345667100).jpg", "author": "Fabio Achilli from Milano, Italy", "license": "CC BY 2.0"}, {"src": "photos/orchard_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Glass_facade_of_an_illuminated_shopping_mall_at_blue_hour_with_vertical_symmetry_impression,_Orchard_Road,_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}], "bugis": [{"src": "photos/bugis_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:New_Bugis_Street,_Singapore,_2014_(02).JPG", "author": "Bahnfrend", "license": "CC BY-SA 4.0"}, {"src": "photos/bugis_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:New_Bugis_Street,_Singapore,_2014_(03).JPG", "author": "Bahnfrend", "license": "CC BY-SA 4.0"}, {"src": "photos/bugis_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:New_Bugis_Street,_Singapore,_2014_(01).JPG", "author": "Bahnfrend", "license": "CC BY-SA 4.0"}, {"src": "photos/bugis_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Singapore-Bugis_Street.jpg", "author": "Adjoajo", "license": "CC BY-SA 4.0"}], "mustafa": [{"src": "photos/mustafa_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Mustafa_Centre,_Little_India,_Singapore_(9005264972).jpg", "author": "Fabio Achilli from Milano, Italy", "license": "CC BY 2.0"}, {"src": "photos/mustafa_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Mustafa_Centre,_Little_India,_Singapore_(43433407434).jpg", "author": "Fabio Achilli from Milano, Italy", "license": "CC BY 2.0"}, {"src": "photos/mustafa_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Mustafa_Centre,_2023_(01).jpg", "author": "Bahnfrend", "license": "CC BY-SA 4.0"}, {"src": "photos/mustafa_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:MustafaCentre.JPG", "author": "", "license": "LGPL"}], "simlim": [{"src": "photos/simlim_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Outside_view_of_Rochor_MRT_Station_and_Sim_Lim_Square,_Singapore_-_20160108.jpg", "author": "Skirtick.", "license": "CC BY-SA 4.0"}, {"src": "photos/simlim_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Sim_Lim_Square_-_20230829_-_RSKY.jpg", "author": "Robert Sim", "license": "CC BY-SA 4.0"}, {"src": "photos/simlim_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Sim_Lim_Square_20210503_123533.jpg", "author": "ZKang123", "license": "CC BY-SA 4.0"}, {"src": "photos/simlim_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:SimLimSquare-Singapore-20051212.jpg", "author": "Fooby at en.wikipedia.", "license": "CC BY-SA 3.0"}], "shoppes": [{"src": "photos/shoppes_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Interior_of_The_Shoppes_at_Marina_Bay_Sands,_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}, {"src": "photos/shoppes_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Marina_Bay_Sands_and_illuminated_polyhedral_building_Louis_Vuitton_over_the_water_at_blue_hour_with_pink_clouds_in_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}, {"src": "photos/shoppes_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Puente_Helix,_museo_ArtScience_y_hotel_Marina_Bay_Sands,_Marina_Bay,_Singapur,_2023-08-17,_DD_67-69_HDR.jpg", "author": "Diego Delso", "license": "CC BY-SA 4.0"}, {"src": "photos/shoppes_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Cricket_match_and_Marina_Bay_Sands_Hotel_in_Singapore.jpg", "author": "Basile Morin", "license": "CC BY-SA 4.0"}], "vivocity": [{"src": "photos/vivocity_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:VivoCity_Singapore_July_2026.jpg", "author": "TenthAvenueFreezeOut", "license": "CC BY-SA 4.0"}, {"src": "photos/vivocity_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:VivoCity,_Singapore_%F0%9F%87%B8%F0%9F%87%AC_-_54246019355.jpg", "author": "Sharon Hahn Darlin", "license": "CC BY 2.0"}, {"src": "photos/vivocity_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:VivoCity,_Singapore_%F0%9F%87%B8%F0%9F%87%AC_-_54246012845.jpg", "author": "Sharon Hahn Darlin", "license": "CC BY 2.0"}, {"src": "photos/vivocity_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:VivoCity,_Singapore_%F0%9F%87%B8%F0%9F%87%AC.jpg", "author": "Sharon Hahn Darlin", "license": "CC BY 2.0"}], "jewel": [{"src": "photos/jewel_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:At_Jewel_Changi,_Singapore_2023_36.jpg", "author": "Photograph by Mike Peel (www.mikepeel.net).", "license": "CC BY-SA 4.0"}, {"src": "photos/jewel_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Rain_Vortex_Jewel_Changi_Airport.jpg", "author": "kallerna", "license": "CC BY-SA 4.0"}, {"src": "photos/jewel_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:At_Jewel_Changi,_Singapore_2023_44.jpg", "author": "Photograph by Mike Peel (www.mikepeel.net).", "license": "CC BY-SA 4.0"}, {"src": "photos/jewel_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:JewelSingaporeVortex1.jpg", "author": "Matteo Morando", "license": "CC BY-SA 4.0"}], "canopy": [{"src": "photos/canopy_0.jpg", "page": "https://commons.wikimedia.org/wiki/File:Canopy_Park_in_Jewel_Changi_Airport.jpg", "author": "cattan2011", "license": "CC BY 2.0"}, {"src": "photos/canopy_1.jpg", "page": "https://commons.wikimedia.org/wiki/File:Canopy_Park_at_Jewel_Changi_Airport_-_49470136106.jpg", "author": "cattan2011", "license": "CC BY 2.0"}, {"src": "photos/canopy_2.jpg", "page": "https://commons.wikimedia.org/wiki/File:Canopy_Park_at_Jewel_Changi_Airport_-_49592236253.jpg", "author": "cattan2011", "license": "CC BY 2.0"}, {"src": "photos/canopy_3.jpg", "page": "https://commons.wikimedia.org/wiki/File:Canopy_Park_at_Jewel_Changi_Airport_-_49469664283.jpg", "author": "cattan2011", "license": "CC BY 2.0"}]};
+const NS="http://www.w3.org/2000/svg";
+const el=(t,a,txt)=>{const e=document.createElementNS(NS,t);for(const k in a)e.setAttribute(k,a[k]);if(txt!=null)e.textContent=txt;return e};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+
+// ---- Sync through a private GitHub repo (same idea as the inventory site) ----
+const GH={owner:"__OWNER__",repo:"__DATAREPO__",path:"votes.json",token:"__TOKEN__"};
+const API=`https://api.github.com/repos/${GH.owner}/${GH.repo}/contents/${GH.path}`;
+const LS=k=>"sgtrip:"+k;
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(LS(k));return v?JSON.parse(v):d}catch(e){return d}};
+const lsSet=(k,v)=>{try{localStorage.setItem(LS(k),JSON.stringify(v))}catch(e){}};
+let data=lsGet("data",{votes:{}}), sha=lsGet("sha",null), me=lsGet("me",""), queue=lsGet("queue",[]);
+let filter="all", region="center", syncing=false;
+const b64e=s=>btoa(String.fromCharCode(...new TextEncoder().encode(s)));
+const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\n/g,"")),c=>c.charCodeAt(0)));
+const hdr={Authorization:"Bearer "+GH.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"};
+function setStatus(m){document.getElementById("status").textContent=m}
+function merged(){ // server data with my unsent changes on top
+  const v=JSON.parse(JSON.stringify(data.votes||{}));
+  queue.forEach(([id,who,c])=>{v[id]=v[id]||{}; if(c)v[id][who]=c; else delete v[id][who];});
+  return v;
+}
+async function pull(){
+  const r=await fetch(API+"?t="+Date.now(),{headers:hdr,cache:"no-store"});
+  if(r.status===404){data={votes:{}};sha=null;return}
+  if(!r.ok)throw new Error("read "+r.status);
+  const j=await r.json(); sha=j.sha; data=JSON.parse(b64d(j.content)||'{"votes":{}}'); data.votes=data.votes||{};
+}
+async function push(){
+  for(let a=0;a<4;a++){
+    const body={message:"اختيار من "+me,content:b64e(JSON.stringify({votes:merged()},null,1))};
+    if(sha)body.sha=sha;
+    const r=await fetch(API,{method:"PUT",headers:{...hdr,"Content-Type":"application/json"},body:JSON.stringify(body)});
+    if(r.ok){const j=await r.json();sha=j.content.sha;data={votes:merged()};queue=[];return}
+    if(r.status===409||r.status===422){await pull();continue}
+    throw new Error("write "+r.status);
+  }
+  throw new Error("conflict");
+}
+async function sync(){
+  if(syncing)return; syncing=true;
+  try{
+    if(!navigator.onLine){setStatus("ما فيه نت. اختياراتك محفوظة في الجوال وتنرسل لما يرجع النت.");return}
+    await pull(); if(queue.length)await push();
+    lsSet("data",data);lsSet("sha",sha);lsSet("queue",queue);
+    setStatus("متزامن · آخر تحديث "+new Date().toLocaleTimeString("ar-SA",{hour:"numeric",minute:"2-digit"}));
+  }catch(e){setStatus("ما قدرنا نوصل للحفظ الحين. اختياراتك محفوظة في الجوال وبنحاول مرة ثانية.")}
+  finally{syncing=false;applyVotes()}
+}
+function votesOf(id){return merged()[id]||{}}
+function myState(id){return votesOf(id)[me]||"none"}
+function groupState(id){const c=Object.values(votesOf(id));if(!c.length)return"none";
+  if(c.every(x=>x==="yes"))return"yes"; if(c.every(x=>x==="no"))return"no"; return"mixed"}
+function vote(id,v){
+  if(!me){document.getElementById("mename").focus();return}
+  queue=queue.filter(q=>!(q[0]===id&&q[1]===me)); queue.push([id,me,myState(id)===v?null:v]);
+  lsSet("queue",queue); applyVotes(); clearTimeout(vote.t); vote.t=setTimeout(sync,600);
+}
+function applyVotes(){
+  let y=0,m=0,u=0;
+  ACTS.forEach(a=>{
+    const g=groupState(a.id), mine=myState(a.id); if(g==="yes")y++; if(g==="mixed")m++; if(mine==="none")u++;
+    const card=document.getElementById("c-"+a.id); card.dataset.state=g;
+    card.hidden=!(filter==="all"||(filter==="mine"?mine==="none":filter===g));
+    document.getElementById("y-"+a.id).setAttribute("aria-pressed",mine==="yes");
+    document.getElementById("n-"+a.id).setAttribute("aria-pressed",mine==="no");
+    document.querySelectorAll(`#c-${a.id} .vote button`).forEach(b=>b.disabled=!me);
+    document.getElementById("w-"+a.id).innerHTML=Object.entries(votesOf(a.id)).map(([w,c])=>`<span>${esc(w)}: ${c==="yes"?"✓ نروح":"✕ لا"}</span>`).join("");
+  });
+  document.getElementById("cy").textContent="اتفقنا نروح "+y;
+  document.getElementById("cm").textContent="اختلفنا "+m;
+  document.getElementById("cu").textContent="ما اخترت "+u;
+  drawMap();
+}
+
+
+function renderCards(){
+  document.getElementById("cats").innerHTML=CATS.map(([c,label])=>{
+    const items=ACTS.filter(a=>a.cat===c);
+    return `<section class="cat"><div class="cathead"><h2>${label}</h2></div><div class="cards">${items.map(a=>`
+      <article class="card" id="c-${a.id}" data-id="${a.id}">
+        <div class="photos">${(PHOTOS[a.id]||[]).map((p,i)=>`<button data-id="${a.id}" data-i="${i}" aria-label="كبّر صورة ${i+1} من ${esc(a.name)}"><img src="${p.src}" alt="${esc(a.name)}" loading="lazy"></button>`).join("")}</div>
+        <div class="body">
+          <div class="top"><span class="num">${a.n}</span><h3>${esc(a.name)}</h3></div>
+          <p class="desc">${esc(a.desc)}</p>
+          <div class="facts"><span>المدة: <b>${a.dur}</b></span><span>السعر: <b>${a.price}</b></span></div>
+          ${a.warn?`<div class="warn">⚠️ ${a.warn}</div>`:""}
+          ${a.reg?`<button class="where" data-id="${a.id}">وريني مكانها على الخريطة</button>`:`<span class="facts">في المطار، وما هي على الخريطة</span>`}
+          <div class="vote"><button class="yes" id="y-${a.id}" data-id="${a.id}" data-v="yes" aria-pressed="false">✓ نروح</button><button class="no" id="n-${a.id}" data-id="${a.id}" data-v="no" aria-pressed="false">✕ لا</button></div>
+          <div class="who" id="w-${a.id}"></div>
+        </div>
+      </article>`).join("")}</div></section>`;
+  }).join("");
+  document.getElementById("credits").innerHTML=ACTS.flatMap(a=>(PHOTOS[a.id]||[]).map(p=>`<li>${esc(a.name)}: <a href="${p.page}" target="_blank" rel="noopener">${esc(p.author||"مجهول")}</a>، ${esc(p.license||"")}</li>`)).join("");
+}
+
+function drawMap(){
+  const M=REG[region], svg=document.getElementById("map");
+  svg.setAttribute("viewBox",`0 0 ${M.w} ${M.h}`); svg.replaceChildren();
+  const n=256*2**M.z, X=lo=>(lo+180)/360*n-M.x0, Y=la=>{const s=Math.sin(la*Math.PI/180);return (0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n-M.y0};
+  svg.appendChild(el("image",{href:"maps/"+region+".jpg",x:0,y:0,width:M.w,height:M.h}));
+  if(region==="center"){const [la,lo]=COORD.hotel;const g=el("g",{});
+    g.appendChild(el("rect",{x:X(lo)-30,y:Y(la)-13,width:60,height:26,rx:6,fill:"var(--accent)",stroke:"var(--halo)","stroke-width":2.5}));
+    g.appendChild(el("text",{x:X(lo),y:Y(la)+5,"text-anchor":"middle","font-size":13,"font-weight":600,fill:"#fff","font-family":"var(--body)"},"الفندق"));svg.appendChild(g);}
+  ACTS.filter(a=>a.reg===region).forEach(a=>{
+    const [la,lo]=COORD[a.id], s=groupState(a.id), x=X(lo), y=Y(la);
+    const fill=s==="yes"?"var(--yes)":s==="no"?"var(--no)":s==="mixed"?"var(--mixed)":"var(--pin)";
+    const g=el("g",{class:"pin",tabindex:0,role:"button","aria-label":a.name,"data-id":a.id});
+    g.appendChild(el("circle",{cx:x,cy:y,r:16,fill,stroke:"var(--halo)","stroke-width":3}));
+    g.appendChild(el("text",{x,y:y+5,"text-anchor":"middle","font-size":14,"font-weight":700,fill:"#fff","font-family":"var(--body)"},a.n));
+    g.appendChild(el("text",{x,y:y+34,"text-anchor":"middle","font-size":13,"font-weight":600,fill:"#13201B",stroke:"#fff","stroke-width":4,"paint-order":"stroke","font-family":"var(--body)"},a.name.split(":")[0].split(" و")[0].slice(0,22)));
+    svg.appendChild(g);
+  });
+}
+
+function goto(id){
+  const card=document.getElementById("c-"+id); if(!card)return;
+  if(card.hidden){filter="all";setFilter();applyVotes();}
+  card.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"center"});
+  card.classList.add("flash"); setTimeout(()=>card.classList.remove("flash"),1600);
+}
+function setFilter(){document.querySelectorAll("#filters button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===filter))}
+function setRegion(r){region=r;document.querySelectorAll("#maptabs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.r===r));drawMap()}
+
+let lbId=null,lbI=0;
+function openLb(id,i){lbId=id;lbI=i;showLb();document.getElementById("lb").hidden=false;document.getElementById("lbclose").focus()}
+function showLb(){const ps=PHOTOS[lbId];lbI=(lbI+ps.length)%ps.length;const p=ps[lbI];const a=ACTS.find(x=>x.id===lbId);
+  document.getElementById("lbimg").src=p.src;document.getElementById("lbimg").alt=a.name;
+  document.getElementById("lbcap").innerHTML=`${esc(a.name)} · ${lbI+1}/${ps.length}<br>تصوير: <a href="${p.page}" target="_blank" rel="noopener">${esc(p.author||"مجهول")}</a> · ${esc(p.license||"")}`}
+function closeLb(){document.getElementById("lb").hidden=true;const b=document.querySelector(`.photos button[data-id="${lbId}"][data-i="${lbI}"]`);b&&b.focus()}
+
+
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button,.pin"); if(!t)return;
+  if(t.matches(".vote button"))vote(t.dataset.id,t.dataset.v);
+  else if(t.matches(".photos button"))openLb(t.dataset.id,+t.dataset.i);
+  else if(t.matches(".where")){const a=ACTS.find(x=>x.id===t.dataset.id);setRegion(a.reg);document.querySelector(".mapbox").scrollIntoView({behavior:"smooth",block:"start"})}
+  else if(t.matches(".pin"))goto(t.dataset.id);
+  else if(t.matches("#filters button")){filter=t.dataset.f;setFilter();applyVotes()}
+  else if(t.matches("#maptabs button"))setRegion(t.dataset.r);
+  else if(t.id==="lbclose")closeLb();
+  else if(t.id==="lbnext"){lbI++;showLb()}
+  else if(t.id==="lbprev"){lbI--;showLb()}
+});
+document.addEventListener("keydown",e=>{
+  if(!document.getElementById("lb").hidden){if(e.key==="Escape")closeLb();if(e.key==="ArrowLeft"){lbI++;showLb()}if(e.key==="ArrowRight"){lbI--;showLb()}return}
+  const p=e.target.closest&&e.target.closest(".pin"); if(p&&(e.key==="Enter"||e.key===" ")){e.preventDefault();goto(p.dataset.id)}
+});
+document.getElementById("lb").addEventListener("click",e=>{if(e.target.id==="lb")closeLb()});
+
+
+renderCards();
+document.getElementById("maptabs").innerHTML=Object.entries(REGNAMES).map(([r,n])=>`<button class="chipbtn" data-r="${r}" aria-pressed="${r===region}">${n}</button>`).join("");
+const meform=document.getElementById("meform");
+meform.hidden=!!me;
+meform.addEventListener("submit",e=>{e.preventDefault();const v=document.getElementById("mename").value.trim();if(!v)return;me=v;lsSet("me",me);meform.hidden=true;applyVotes()});
+applyVotes(); setStatus("جاري المزامنة…"); sync();
+setInterval(()=>{if(document.visibilityState==="visible")sync()},20000);
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sync()});
+window.addEventListener("online",sync);
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+
+</script>
+
+</body></html>

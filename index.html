@@ -78,6 +78,7 @@ a{color:var(--accent)}
 .vote button:disabled{opacity:.45;cursor:not-allowed}
 .vote .y[aria-pressed="true"]{background:#1E8A4C;border-color:#1E8A4C;color:#fff}
 .vote .n[aria-pressed="true"]{background:#B4402C;border-color:#B4402C;color:#fff}
+.vote .l[aria-pressed="true"]{background:#B86E00;border-color:#B86E00;color:#fff}
 .vote .who{font-size:.75rem;color:var(--muted)}
 .vote .who span{margin-left:8px}
 .gate{background:var(--accent-soft);border-radius:12px;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
@@ -94,7 +95,7 @@ body[data-f="m"] .lv-n, body[data-f="m"] .lv-x, body[data-f="mn"] .lv-x{display:
     <h1>سنغافورة · 5–9 ديسمبر 2026</h1>
     <p class="sub">كل فعالية مكتوب جنبها إذا هي <span class="lvl m">لازم</span> أو <span class="lvl n">حلو</span> أو <span class="lvl x">إذا فيه وقت</span>. الأسعار لشخصين بالريال.</p>
     <div class="gate" id="gate">
-      <p id="gstatus">كل فعالية تحتها زرين: <b>نعم</b> أو <b>لا</b>. جاري التحميل…</p>
+      <p id="gstatus">كل فعالية تحتها ثلاث أزرار: <b>نعم</b> أو <b>لا</b> أو <b>أحدد بعدين</b>. جاري التحميل…</p>
       <form id="pwform" hidden><input id="pw" type="password" autocomplete="current-password" placeholder="كلمة السر"><button>فتح</button></form>
       <form id="meform" hidden><input id="mename" maxlength="20" placeholder="وش اسمك؟"><button>حفظ</button></form>
     </div>
@@ -356,7 +357,7 @@ document.getElementById("days").innerHTML=DAYS.map(d=>{
   <div class="sum">${groups.map(g=>`<div class="${g.l} lv-${g.l}"><b>${L[g.l]}</b><ul>${(g.names.length?g.names:["—"]).map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`).join("")}</div>
   ${d.maps.map(m=>`<div class="mapbox"><svg data-map="${m}" data-day="${d.id}" role="img" aria-label="خريطة ${d.date}"></svg></div>`).join("")}
   <p class="note" style="margin:0">${d.cap}</p>
-  <ol class="tl">${d.items.map((it,i)=>{const [t,l,w,n,p]=it;return `<li class="${l?"lv-"+l:"logi"}"><span class="t">${t}</span><div class="what">${nums[i]?`<span class="pinno">${nums[i]}</span>`:""}${lvTag(l)}<b>${esc(w)}</b>${n?`<small>${esc(n)}</small>`:""}${VOTEID[w]&&l?`<div class="vote" data-v="${VOTEID[w]}"><button class="y" data-c="yes" aria-pressed="false">✓ نعم</button><button class="n" data-c="no" aria-pressed="false">✕ لا</button><span class="who"></span></div>`:""}</div><span class="price">${p?p+" <em>ر.س</em>":""}</span></li>`}).join("")}</ol>
+  <ol class="tl">${d.items.map((it,i)=>{const [t,l,w,n,p]=it;return `<li class="${l?"lv-"+l:"logi"}"><span class="t">${t}</span><div class="what">${nums[i]?`<span class="pinno">${nums[i]}</span>`:""}${lvTag(l)}<b>${esc(w)}</b>${n?`<small>${esc(n)}</small>`:""}${VOTEID[w]&&l?`<div class="vote" data-v="${VOTEID[w]}"><button class="y" data-c="yes" aria-pressed="false">✓ نعم</button><button class="n" data-c="no" aria-pressed="false">✕ لا</button><button class="l" data-c="later" aria-pressed="false">⏳ أحدد بعدين</button><span class="who"></span></div>`:""}</div><span class="price">${p?p+" <em>ر.س</em>":""}</span></li>`}).join("")}</ol>
   ${d.alt?`<div class="box">${d.alt}</div>`:""}
 </section>`}).join("");
 const MAPDEFS={"d1": ["hotel", "kampong", "bugis", "domes", "grove", "satay", "plaza"], "d2": ["hotel", "birds", "botanic", "safari"], "d3": ["hotel", "hf", "uss", "rws"], "d4a": ["hf", "luge", "rws", "palawan"], "d4b": ["greenheart", "skypark", "artscience", "helix", "merlion", "clarke", "plaza", "flyer", "chinatown"], "d5": ["hotel", "fort", "emerald", "orchard"]};
@@ -763,7 +764,7 @@ function ready(){
   const mf=document.getElementById("meform");
   if(!me){gs("وش اسمك؟ يطلع جنب اختياراتك.");mf.hidden=false;
     mf.onsubmit=e=>{e.preventDefault();const v=document.getElementById("mename").value.trim();if(!v)return;me=v;lsSet("me",me);mf.hidden=true;ready()};return}
-  gs(`أهلًا ${esc(me)}. اضغط <b>نعم</b> أو <b>لا</b> تحت كل فعالية، واختيارك يوصل على طول.`);
+  gs(`أهلًا ${esc(me)}. اختر <b>نعم</b> أو <b>لا</b> أو <b>أحدد بعدين</b> تحت كل فعالية، واختيارك يوصل على طول.`);
   applyVotes(); sync(); setInterval(()=>{if(document.visibilityState==="visible")sync()},20000);
   document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")sync()});
 }
@@ -781,9 +782,9 @@ async function sync(){if(!GH||syncing)return;syncing=true;
   finally{syncing=false;applyVotes()}}
 function applyVotes(){const v=merged();
   document.querySelectorAll(".vote").forEach(box=>{const id=box.dataset.v,c=v[id]||{},mine=c[me];
-    box.querySelector(".y").setAttribute("aria-pressed",mine==="yes");box.querySelector(".n").setAttribute("aria-pressed",mine==="no");
+    box.querySelector(".y").setAttribute("aria-pressed",mine==="yes");box.querySelector(".n").setAttribute("aria-pressed",mine==="no");box.querySelector(".l").setAttribute("aria-pressed",mine==="later");
     box.querySelectorAll("button").forEach(b=>b.disabled=!(GH&&me));
-    box.querySelector(".who").innerHTML=Object.entries(c).filter(([w])=>w!==me).map(([w,x])=>`<span>${esc(w)}: ${x==="yes"?"✓ نعم":"✕ لا"}</span>`).join("")})}
+    box.querySelector(".who").innerHTML=Object.entries(c).filter(([w])=>w!==me).map(([w,x])=>`<span>${esc(w)}: ${x==="yes"?"✓ نعم":x==="no"?"✕ لا":"⏳ بعدين"}</span>`).join("")})}
 document.addEventListener("click",e=>{const b=e.target.closest(".vote button");if(!b||b.disabled)return;
   const id=b.closest(".vote").dataset.v,cur=merged()[id]?.[me];
   queue=queue.filter(q=>!(q[0]===id&&q[1]===me));queue.push([id,me,cur===b.dataset.c?null:b.dataset.c]);lsSet("queue",queue);applyVotes();

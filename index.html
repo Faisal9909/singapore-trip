@@ -53,6 +53,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-off
 ol.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
 ol.tl li{display:grid;grid-template-columns:50px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--line);align-items:start}
 ol.tl li.logi{opacity:.8}
+.trips{display:flex;gap:6px;justify-content:center}.trips a{flex:1;max-width:200px;text-align:center;text-decoration:none;font-weight:600;padding:8px 12px;border-radius:10px;border:1.5px solid var(--line);color:var(--fg);background:var(--card)}.trips a[aria-current="page"]{background:var(--accent);border-color:var(--accent);color:var(--card)}
+
 .ph{display:block;width:100%;max-width:420px;aspect-ratio:16/10;object-fit:cover;border-radius:8px;margin:6px 0 2px;background:var(--line)}
 .what .desc{margin:3px 0 2px;font-size:.88rem;line-height:1.7}
 .what .phcap{font-size:.7rem;color:var(--muted)}
@@ -95,6 +97,8 @@ body[data-f="m"] .lv-n, body[data-f="m"] .lv-x, body[data-f="mn"] .lv-x{display:
 
 </head><body>
 <div class="wrap">
+<nav class="trips" aria-label="الرحلات"><a href="./" aria-current="page">سنغافورة 🇸🇬</a><a href="phuket.html">بوكيت 🇹🇭</a></nav>
+
   <header>
     <h1>سنغافورة · 5–9 ديسمبر 2026</h1>
     <p class="sub">كل فعالية مكتوب جنبها إذا هي <span class="lvl m">لازم</span> أو <span class="lvl n">حلو</span> أو <span class="lvl x">إذا فيه وقت</span>. الأسعار لشخصين بالريال.</p>
